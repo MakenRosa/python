@@ -1,0 +1,1 @@
+./projeto-todo/todo/todo/settings.py
