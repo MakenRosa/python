@@ -17,10 +17,10 @@
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
-        <li{% if message.tags %} class="alert alert-{{message.tags}}"{% endif %}>
+        <li{% if message.tags %} class="alert alert-{{message.tags}}" {% endif %}>
             {{ message }}
-        </li>
-        {% endfor %}
+            </li>
+            {% endfor %}
     </ul>
     {% endif %}
     <ul class="task-list">
@@ -33,4 +33,23 @@
         {% endfor %}
     </ul>
 </div>
+<script>
+    const search = document.getElementById('search');
+    search.addEventListener('keyup', function () {
+        const query = search.value;
+        searchItems(query);
+    });
+
+    function searchItems(query) {
+        const items = document.querySelectorAll('.task-item');
+        items.forEach(function (item) {
+            const itemText = item.innerText;
+            if (itemText.toLowerCase().indexOf(query.toLowerCase()) != -1) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+</script>
 {% endblock %}

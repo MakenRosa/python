@@ -5,6 +5,9 @@ from django.contrib import messages
 
 def taskList(request):
     tasks = Task.objects.all().order_by('-created')
+    query = request.GET.get('search')
+    if query:
+        tasks = Task.objects.filter(title__icontains=query)
     return render(request, 'tasks/list.html', {'tasks': tasks})
 
 def taskView(request, id):
