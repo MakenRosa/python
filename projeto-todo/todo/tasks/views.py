@@ -1,11 +1,42 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-
-def helloWorld(request):
-    return HttpResponse('Hello World')
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Task
+from .forms import TaskForm
+from django.contrib import messages
 
 def taskList(request):
-    return render(request, 'tasks/list.html')
+    tasks = Task.objects.all().order_by('-created')
+    query = request.GET.get('search')
+    if query:
+        tasks = Task.objects.filter(title__icontains=query)
+    return render(request, 'tasks/list.html', {'tasks': tasks})
 
-def yourName(request, name):
-    return render(request, 'tasks/yourname.html', {'name': name})
+def taskView(request, id):
+    task = get_object_or_404(Task, pk=id)
+    return render(request, 'tasks/task.html', {'task': task})
+
+def newTask(request):
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('task-list')
+    else:
+        form = TaskForm()
+    return render(request, 'tasks/newtask.html', {'form': form})
+
+def editTask(request, id):
+    task = get_object_or_404(Task, pk=id)
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect('task-list')
+    else:
+        form = TaskForm(instance=task)
+    return render(request, 'tasks/edittask.html', {'form': form})
+
+def deleteTask(request, id):
+    task = get_object_or_404(Task, pk=id)
+    task.delete()
+    messages.info(request, 'Tarefa deletada com sucesso!')
+    return redirect('task-list')
